@@ -7,7 +7,7 @@
 @define-color background-color_2 #1c1c1c;
 @define-color background-color_3 #424242;
 @define-color background-color_4 #252525;
-@define-color background-color_5 #2f5631;
+@define-color background-color_5 #0277bd;
 @define-color background-color_6 #006064;
 @define-color background-color_7 #545454;
 @define-color background-color_8 #006412;
@@ -99,7 +99,7 @@ switch {
 
 treeview.view check:checked,
 switch:checked {
-    background-color: #2f5631;
+    background-color: #0277bd;
 }
 
 treeview.view check:checked {
@@ -117,7 +117,7 @@ trough {
 
 trough highlight,
 trough progress {
-    background-color: #2f5631;
+    background-color: #0277bd;
     color: #e2e2e2;
 }
 
@@ -171,14 +171,14 @@ textview .time {
 }
 
 .dialog-secondary {
-     border-bottom-color: @color2;
+    border-bottom-color: @color2;
 }
 
 .dialog-primary {
-     border-bottom-color: @color1;
+    border-bottom-color: @color1;
 }
 
-.horizontal_togglebuttons  {
+.horizontal_togglebuttons {
     border-color: #545454;
     border-width: .1em;
     background-color: #252525;
