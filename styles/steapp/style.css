@@ -13,8 +13,8 @@
 @define-color background-color_6 #b2ebf2;
 @define-color background-color_7 #e0e0e0;
 @define-color background-color_8 #0277bd;
-@define-color background-color_9 #ffe0b2;
-@define-color background-color_10 #ffcdd2;
+@define-color background-color_9 #ffc107;
+@define-color background-color_10 #ff5252;
 @define-color background-color_12 #ffecb3;
 @define-color background-color_13 #f8bbd0;
 @define-color background-color_14 #fafafa;
@@ -205,12 +205,12 @@ textview .time {
 
 .message_popup_warning,
 .message_popup_warning button {
-    background-color: #ffe0b2;
+    background-color: #ffc107;
 }
 
 .message_popup_error,
 .message_popup_error button {
-    background-color: #ffcdd2;
+    background-color: #ff5252;
 }
 
 .numpad_key {
@@ -228,9 +228,9 @@ textview .time {
 }
 
 .message {
-    border-color: #ffcdd2;
+    border-color: #ff5252;
     color: #212121;
-    background-color: #ffcdd2;
+    background-color: #ff5252;
 }
 
 .message button {
