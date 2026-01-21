@@ -1,26 +1,29 @@
-/* Material-darker theme created by Alfredo Monclus 2021 */
-@define-color color_1 #e2e2e2;
-@define-color color_2 #2196f3;
-@define-color color_3 #fb8c00;
-@define-color color_4 #9E9E9E;
-@define-color color_5 #121212;
-@define-color background-color_2 #1c1c1c;
-@define-color background-color_3 #424242;
-@define-color background-color_4 #0277bd;
-@define-color background-color_5 #2f5631;
-@define-color background-color_6 #006064;
-@define-color background-color_7 #545454;
-@define-color background-color_8 #006412;
-@define-color background-color_9 #EF6C00;
-@define-color background-color_10 #B71C1C;
-@define-color background-color_12 #f9b274;
-@define-color background-color_13 #CF6679;
-@define-color background-color_14 #090909;
-@define-color border-color_6 #a2a2a2;
-@define-color border-color_7 #282828;
+/* Material-light theme (based on Material-darker) */
+
+@define-color color_1 #212121;
+@define-color color_2 #1976d2;
+@define-color color_3 #f57c00;
+@define-color color_4 #757575;
+@define-color color_5 #ffffff;
+
+@define-color background-color_2 #f5f5f5;
+@define-color background-color_3 #e0e0e0;
+@define-color background-color_4 #eeeeee;
+@define-color background-color_5 #0277bd;
+@define-color background-color_6 #b2ebf2;
+@define-color background-color_7 #e0e0e0;
+@define-color background-color_8 #0277bd;
+@define-color background-color_9 #ffe0b2;
+@define-color background-color_10 #ffcdd2;
+@define-color background-color_12 #ffecb3;
+@define-color background-color_13 #f8bbd0;
+@define-color background-color_14 #fafafa;
+
+@define-color border-color_6 #bdbdbd;
+@define-color border-color_7 #e0e0e0;
 
 * {
-    color: #000000;
+    color: #212121;
     font-family: RobotoMedium;
 }
 
@@ -36,21 +39,21 @@ button {
 }
 
 button:active {
-    background-color: #424242;
+    background-color: #e0e0e0;
 }
 
 .button_active {
-    border-color: #424242;
+    border-color: #e0e0e0;
     border-style: solid;
-    background-color: #424242;
+    background-color: #e0e0e0;
 }
 
 button.color1,
 button.color2,
 button.color3,
 button.color4 {
-    background-color: #0277bd;
-    border-color: #0277bd;
+    background-color: #eeeeee;
+    border-color: #eeeeee;
     border-radius: .25em;
     padding-top: 0.4em;
 }
@@ -63,22 +66,22 @@ button.update:active,
 button.invalid:active,
 .dialog button:active {
     border-style: none;
-    background-color: #424242;
+    background-color: #e0e0e0;
 }
 
 .active image,
 button.update {
-    color: #2196f3;
+    color: #1976d2;
     background-color: #ffffff;
-    border-color: #2196f3;
+    border-color: #1976d2;
     border-radius: .5em;
     border-width: .1em;
 }
 
 button.invalid {
-    color: #fb8c00;
+    color: #f57c00;
     background-color: #ffffff;
-    border-color: #fb8c00;
+    border-color: #f57c00;
     border-radius: .5em;
     border-width: .1em;
 }
@@ -88,41 +91,41 @@ menuitem,
 combobox button,
 combobox arrow,
 combobox menuitem {
-    background-color: #0277bd;
-    border-color: #121212;
+    background-color: #eeeeee;
+    border-color: #ffffff;
 }
 
 treeview.view check,
 switch {
-    background-color: #1c1c1c;
+    background-color: #f5f5f5;
 }
 
 treeview.view check:checked,
 switch:checked {
-    background-color: #2f5631;
+    background-color: #0277bd;
 }
 
 treeview.view check:checked {
-    -gtk-icon-source: url("./styles/material-darker/images/complete.svg");
+    -gtk-icon-source: url("./styles/steapp/images/complete.svg");
 }
 
 label {
-    color: #000000;
+    color: #212121;
 }
 
 trough {
     background-color: #ffffff;
-    color: #000000;
+    color: #212121;
 }
 
 trough highlight,
 trough progress {
-    background-color: #2f5631;
-    color: #000000;
+    background-color: #0277bd;
+    color: #212121;
 }
 
 scale-mark {
-    color: #000000;
+    color: #212121;
 }
 
 scrollbar,
@@ -132,15 +135,15 @@ scrollbar trough {
 }
 
 scrollbar slider {
-    background-color: #1c1c1c;
+    background-color: #f5f5f5;
 }
 
 textview .time {
-    color: #9E9E9E;
+    color: #757575;
 }
 
 .active_device {
-    background-color: #1c1c1c;
+    background-color: #f5f5f5;
 }
 
 .dialog {
@@ -149,17 +152,16 @@ textview .time {
 }
 
 .dialog button {
-    background-color: #0277bd;
+    background-color: #eeeeee;
     border-radius: .25em;
 }
 
-
 .dialog-error {
-    border-bottom-color: #CF6679;
+    border-bottom-color: #f8bbd0;
 }
 
 .dialog-warning {
-    border-bottom-color: #f9b274;
+    border-bottom-color: #ffecb3;
 }
 
 .dialog-info {
@@ -179,66 +181,63 @@ textview .time {
 }
 
 .horizontal_togglebuttons {
-    border-color: #545454;
+    border-color: #e0e0e0;
     border-width: .1em;
-    background-color: #0277bd;
+    background-color: #eeeeee;
 }
 
 .horizontal_togglebuttons_active {
-    background-color: #545454;
+    background-color: #e0e0e0;
 }
 
 .fan_slider {
-    color: #000000;
+    color: #212121;
 }
 
 .message_popup {
-    border-bottom-color: #000000;
+    border-bottom-color: #212121;
 }
 
 .message_popup_echo,
 .message_popup_echo button {
-    background-color: #006412;
+    background-color: #0277bd;
 }
 
 .message_popup_warning,
 .message_popup_warning button {
-    background-color: #EF6C00;
+    background-color: #ffe0b2;
 }
 
 .message_popup_error,
 .message_popup_error button {
-    background-color: #B71C1C;
+    background-color: #ffcdd2;
 }
 
 .numpad_key {
-    border-color: #545454;
-    background-color: #0277bd;
+    border-color: #e0e0e0;
+    background-color: #eeeeee;
 }
 
-.printing-status {
-    color: #000000;
-}
-
+.printing-status,
 .printing-progress-text {
-    color: #000000;
+    color: #212121;
 }
 
 .printing-status-label {
-    color: #9E9E9E;
+    color: #757575;
 }
 
 .message {
-    border-color: #B71C1C;
-    color: #000000;
-    background-color: #B71C1C;
+    border-color: #ffcdd2;
+    color: #212121;
+    background-color: #ffcdd2;
 }
 
 .message button {
-    background-color: #e2e2e2;
-    color: #121212;
+    background-color: #ffffff;
+    color: #212121;
 }
 
 .keyboard_pad {
-    background-color: #090909;
+    background-color: #fafafa;
 }
