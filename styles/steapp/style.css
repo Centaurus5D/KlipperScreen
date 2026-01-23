@@ -34,9 +34,12 @@ window {
     background-color: #ffffff;
 }
 
+
 button {
     background-color: #ffffff;
+    padding: 0;
 }
+
 
 button:active {
     background-color: #e0e0e0;
@@ -54,8 +57,8 @@ button.color3,
 button.color4 {
     background-color: #eeeeee;
     border-color: #eeeeee;
-    border-radius: .25em;
-    padding-top: 0.4em;
+    border-radius: 4px;
+
 }
 
 button.color1:active,
@@ -111,6 +114,8 @@ treeview.view check:checked {
 
 label {
     color: #212121;
+    padding-bottom: 0;
+    padding-top: 0;
 }
 
 trough {
@@ -182,8 +187,9 @@ textview .time {
 
 .horizontal_togglebuttons {
     border-color: #e0e0e0;
-    border-width: .1em;
+    border-width: 2px;
     background-color: #eeeeee;
+    min-height: 2em;
 }
 
 .horizontal_togglebuttons_active {

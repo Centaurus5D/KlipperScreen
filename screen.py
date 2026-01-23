@@ -301,6 +301,7 @@ class KlipperScreen(Gtk.Window):
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
                 "manual_probe": ['is_active'],
                 "screws_tilt_adjust": ['results', 'error', 'max_deviation'],
+                "module_5d": ["toolhead", "gcode_position", "homing_origin", "wcs_offsets", "current_wcs"]
             }
         }
         for extruder in self.printer.get_tools():
@@ -1158,6 +1159,7 @@ class KlipperScreen(Gtk.Window):
             *self.printer.get_filament_sensors(),
             *self.printer.get_output_pins(),
             *self.printer.get_leds(),
+            "module_5d"
         )
 
         data = self.apiclient.send_request("printer/objects/query?" + "&".join(items))

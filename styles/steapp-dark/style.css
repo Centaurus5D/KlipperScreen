@@ -51,8 +51,8 @@ button.color3,
 button.color4 {
     background-color: #252525;
     border-color: #252525;
-    border-radius: .25em;
-    padding-top: 0.4em;
+    border-radius: 4px;
+    padding-top: 0.1em;
 }
 
 button.color1:active,
@@ -180,7 +180,7 @@ textview .time {
 
 .horizontal_togglebuttons {
     border-color: #545454;
-    border-width: .1em;
+    border-width: 2px;
     background-color: #252525;
 }
 

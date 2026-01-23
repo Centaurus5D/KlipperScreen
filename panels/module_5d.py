@@ -8,7 +8,6 @@ from gi.repository import Gtk
 from ks_includes.KlippyGcodes import KlippyGcodes
 from ks_includes.screen_panel import ScreenPanel
 
-
 class Panel(ScreenPanel):
     distances = [".1", ".5", "1", "5", "10", "25", "50"]
     distance = distances[-2]
@@ -34,6 +33,10 @@ class Panel(ScreenPanel):
             "y-": self._gtk.Button("arrow-down", "Y-", "color2"),
             "z+": self._gtk.Button("z-farther", "Z+", "color3"),
             "z-": self._gtk.Button("z-closer", "Z-", "color3"),
+            "a+": self._gtk.Button("arrow-down", "A+", "color3"),
+            "a-": self._gtk.Button("arrow-up", "A-", "color3"),
+            "c+": self._gtk.Button("z-farther", "C+", "color3"),
+            "c-": self._gtk.Button("z-closer", "C-", "color3"),
             "home": self._gtk.Button("home", _("Home"), "color4"),
             "motors_off": self._gtk.Button("motor-off", _("Disable Motors"), "color4"),
         }
@@ -43,6 +46,10 @@ class Panel(ScreenPanel):
         self.buttons["y-"].connect("clicked", self.move, "Y", "-")
         self.buttons["z+"].connect("clicked", self.move, "Z", "+")
         self.buttons["z-"].connect("clicked", self.move, "Z", "-")
+        self.buttons["a+"].connect("clicked", self.move, "A", "+")
+        self.buttons["a-"].connect("clicked", self.move, "A", "-")
+        self.buttons["c+"].connect("clicked", self.move, "C", "+")
+        self.buttons["c-"].connect("clicked", self.move, "C", "-")
         self.buttons["home"].connect("clicked", self.home)
         script = {"script": "M18"}
         self.buttons["motors_off"].connect(
@@ -62,17 +69,22 @@ class Panel(ScreenPanel):
             if self._screen.lang_ltr:
                 grid.attach(self.buttons["x+"], 2, 1, 1, 1)
                 grid.attach(self.buttons["x-"], 0, 1, 1, 1)
-                grid.attach(self.buttons["z+"], 2, 2, 1, 1)
+                grid.attach(self.buttons["z+"], 1, 2, 1, 1)
                 grid.attach(self.buttons["z-"], 0, 2, 1, 1)
             else:
                 grid.attach(self.buttons["x+"], 0, 1, 1, 1)
                 grid.attach(self.buttons["x-"], 2, 1, 1, 1)
                 grid.attach(self.buttons["z+"], 0, 2, 1, 1)
                 grid.attach(self.buttons["z-"], 2, 2, 1, 1)
-            grid.attach(adjust, 1, 2, 1, 1)
+            grid.attach(self.buttons["a-"], 3, 0, 1, 1)
+            grid.attach(self.buttons["a+"], 3, 1, 1, 1)
+            grid.attach(self.buttons["c+"], 2, 2, 1, 1)
+            grid.attach(self.buttons["c-"], 3, 2, 1, 1)
+            grid.attach(adjust, 0, 3, 1, 1)
             grid.attach(self.buttons["y+"], 1, 0, 1, 1)
             grid.attach(self.buttons["y-"], 1, 1, 1, 1)
-
+            grid.attach(self.buttons["home"], 1, 3, 1, 1)
+            grid.attach(self.buttons["motors_off"], 3, 3, 1, 1)
         else:
             if self._screen.lang_ltr:
                 grid.attach(self.buttons["x+"], 2, 1, 1, 1)
@@ -88,9 +100,13 @@ class Panel(ScreenPanel):
             else:
                 grid.attach(self.buttons["z+"], 3, 0, 1, 1)
                 grid.attach(self.buttons["z-"], 3, 1, 1, 1)
-
-        grid.attach(self.buttons["home"], 0, 0, 1, 1)
-        grid.attach(self.buttons["motors_off"], 2, 0, 1, 1)
+            grid.attach(self.buttons["a-"], 4, 0, 1, 1)
+            grid.attach(self.buttons["a+"], 4, 1, 1, 1)
+            grid.attach(self.buttons["c+"], 3, 2, 1, 1)
+            grid.attach(self.buttons["c-"], 4, 2, 1, 1)
+            grid.attach(adjust, 2, 2, 1, 1)
+            grid.attach(self.buttons["home"], 0, 2, 1, 1)
+            grid.attach(self.buttons["motors_off"], 1, 2, 1, 1)
 
         distgrid = Gtk.Grid()
         for j, i in enumerate(self.distances):
@@ -103,7 +119,7 @@ class Panel(ScreenPanel):
                 ctx.add_class("horizontal_togglebuttons_active")
             distgrid.attach(self.labels[i], j, 0, 1, 1)
 
-        for p in ("pos_x", "pos_y", "pos_z"):
+        for p in ("pos_x", "pos_y", "pos_z", "pos_a", "pos_c"):
             self.labels[p] = Gtk.Label()
         self.labels["move_dist"] = Gtk.Label(label=_("Move Distance (mm)"))
 
@@ -112,12 +128,12 @@ class Panel(ScreenPanel):
         bottomgrid.attach(self.labels["pos_x"], 0, 0, 1, 1)
         bottomgrid.attach(self.labels["pos_y"], 1, 0, 1, 1)
         bottomgrid.attach(self.labels["pos_z"], 2, 0, 1, 1)
-        bottomgrid.attach(self.labels["move_dist"], 0, 1, 3, 1)
-        if not self._screen.vertical_mode:
-            bottomgrid.attach(adjust, 3, 0, 1, 2)
+        bottomgrid.attach(self.labels["pos_a"], 3, 0, 1, 1)
+        bottomgrid.attach(self.labels["pos_c"], 4, 0, 1, 1)
+        bottomgrid.attach(self.labels["move_dist"], 0, 1, 5, 1)
 
         self.labels["move_menu"] = Gtk.Grid(
-            row_homogeneous=True, column_homogeneous=True
+
         )
         self.labels["move_menu"].attach(grid, 0, 0, 1, 3)
         self.labels["move_menu"].attach(bottomgrid, 0, 3, 1, 1)
@@ -219,6 +235,7 @@ class Panel(ScreenPanel):
             adj.set_upper(max_vel)
         if (
             "gcode_move" in data
+            or "module_5d" in data
             or "toolhead" in data
             and "homed_axes" in data["toolhead"]
         ):
@@ -229,7 +246,16 @@ class Panel(ScreenPanel):
                 elif "gcode_move" in data and "gcode_position" in data["gcode_move"]:
                     self.labels[f"pos_{axis}"].set_text(
                         f"{axis.upper()}: {data['gcode_move']['gcode_position'][i]:.2f}"
-                    )
+                )
+            module_homed_axes = self._printer.get_stat("module_5d", "toolhead").get("homed_axes", "")
+            for i, axis in enumerate(("a", "c")):
+                if axis not in module_homed_axes:
+                    self.labels[f"pos_{axis}"].set_text(f"{axis.upper()}: ?")
+                elif "module_5d" in data and "gcode_position" in data["module_5d"]:
+                    self.labels[f"pos_{axis}"].set_text(
+                        f"{axis.upper()}: {data['module_5d']['gcode_position'][i]:.2f}"
+                )
+
 
     def change_distance(self, widget, distance):
         logging.info(f"### Distance {distance}")
