@@ -16,7 +16,6 @@ class Panel(ScreenPanel):
         title = title or _("5D Module Calibrate")
         super().__init__(screen, title)
         self.show_create = False
-        self.active_mesh = None
         self.distance = ".05"
         section = self._printer.get_config_section("bed_mesh")
         self.mesh_radius = section['mesh_radius'] if 'mesh_radius' in section else None
@@ -40,7 +39,7 @@ class Panel(ScreenPanel):
             'wcs2z-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
         }
         self.buttons['clear'].connect("clicked", self.send_clear_wcs)
-        self.buttons['calib'].connect("clicked", self.tool_calibrate)
+        self.buttons['calib'].connect("clicked", self.show_tool_calibrate)
         self.buttons['a_plus'].connect("clicked", self.adjust_a, "+")
         self.buttons['a_minus'].connect("clicked", self.adjust_a, "-")
         for wcs in range(1, 3):
@@ -183,13 +182,14 @@ class Panel(ScreenPanel):
 
     def tool_calibrate(self, widget):
         widget.set_sensitive(False)
+        tool_radius = self.labels['tool_radius'].get_text()
         self._screen.show_popup_message(_("Calibrating"), level=1)
         if self._printer.get_stat("toolhead", "homed_axes") != "xyz":
             self._screen._ws.klippy.gcode_script("G28")
         module_homed_axes = self._printer.get_stat("module_5d", "toolhead").get("homed_axes", "")
         if module_homed_axes != "ac":
             self._screen._ws.klippy.gcode_script("HOME_MODULE A=1 C=1")
-        self._screen._send_action(widget, "printer.gcode.script", {"script": "TOOL_CALIBRATE"})
+        self._screen._send_action(widget, "printer.gcode.script", {"script": f"TOOL_CALIBRATE TOOL_RADIUS={tool_radius}"})
 
     def adjust_a(self, widget, direction):
         script = f"SET_GCODE_OFFSET A_ADJUST={direction}{self.distance}"
@@ -200,6 +200,35 @@ class Panel(ScreenPanel):
         dist = f"{direction}{self.distance}"
         script = f"G10 L2 R1 P{wcs + 1} {axis}{dist}"
         self._screen._send_action(widget, "printer.gcode.script", {"script": script})
+
+    def show_tool_calibrate(self, widget):
+
+        for child in self.content.get_children():
+            self.content.remove(child)
+
+        if "tool_calibrate" not in self.labels:
+            pl = Gtk.Label(label=_("Profile Name:"), hexpand=False)
+            self.labels['tool_radius'] = Gtk.Entry(hexpand=True, text='3.0')
+            self.labels['tool_radius'].connect("activate", self.tool_calibrate)
+            self.labels['tool_radius'].connect("touch-event", self._screen.show_keyboard)
+            self.labels['tool_radius'].connect("button-press-event", self._screen.show_keyboard)
+
+            save = self._gtk.Button("complete", _("Save"), "color3")
+            save.set_hexpand(False)
+            save.connect("clicked", self.tool_calibrate)
+
+            box = Gtk.Box()
+            box.pack_start(self.labels['tool_radius'], True, True, 5)
+            box.pack_start(save, False, False, 5)
+
+            self.labels['tool_calibrate'] = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5,
+                                                    valign=Gtk.Align.CENTER, hexpand=True, vexpand=True)
+            self.labels['tool_calibrate'].pack_start(pl, True, True, 5)
+            self.labels['tool_calibrate'].pack_start(box, True, True, 5)
+
+        self.content.add(self.labels['tool_calibrate'])
+        self.labels['tool_radius'].grab_focus_without_selecting()
+        self.show_create = True
 
     def send_clear_wcs(self, widget):
         self._screen._send_action(widget, "printer.gcode.script", {"script": "CLEAR_WCS"})
