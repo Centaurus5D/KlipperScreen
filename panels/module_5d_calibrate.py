@@ -17,31 +17,36 @@ class Panel(ScreenPanel):
         super().__init__(screen, title)
         self.show_create = False
         self.active_mesh = None
+        self.distance = ".05"
         section = self._printer.get_config_section("bed_mesh")
         self.mesh_radius = section['mesh_radius'] if 'mesh_radius' in section else None
         self.profiles = {}
         self.buttons = {
             'calib': self._gtk.Button("refresh", _("Calibrate"), "color3", self.bts, Gtk.PositionType.LEFT, 1),
             'clear': self._gtk.Button("cancel", _("Clear"), "color2", self.bts, Gtk.PositionType.LEFT, 1),
-            'a_plus': self._gtk.Button("", "-", "color2"),
-            'a_minus': self._gtk.Button("", "+", "color2"),
-            'wcs1x+': self._gtk.Button("", "+", "color2"),
-            'wcs1x-': self._gtk.Button("", "-", "color2"),
-            'wcs1y+': self._gtk.Button("", "+", "color2"),
-            'wcs1y-': self._gtk.Button("", "-", "color2"),
-            'wcs1z+': self._gtk.Button("", "+", "color2"),
-            'wcs1z-': self._gtk.Button("", "-", "color2"),
-            'wcs2x+': self._gtk.Button("", "+", "color2"),
-            'wcs2x-': self._gtk.Button("", "-", "color2"),
-            'wcs2y+': self._gtk.Button("", "+", "color2"),
-            'wcs2y-': self._gtk.Button("", "-", "color2"),
-            'wcs2z+': self._gtk.Button("", "+", "color2"),
-            'wcs2z-': self._gtk.Button("", "-", "color2"),
+            'a_plus': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'a_minus': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1x+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1x-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1y+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1y-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1z+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs1z-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2x+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2x-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2y+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2y-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2z+': self._gtk.Button("increase", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'wcs2z-': self._gtk.Button("decrease", "", "color2", self.bts, Gtk.PositionType.LEFT, 1),
         }
         self.buttons['clear'].connect("clicked", self.send_clear_wcs)
         self.buttons['calib'].connect("clicked", self.tool_calibrate)
-        self.buttons['a_plus'].connect("clicked", self.adjust_a)
-        self.buttons['a_minus'].connect("clicked", self.adjust_a)
+        self.buttons['a_plus'].connect("clicked", self.adjust_a, "+")
+        self.buttons['a_minus'].connect("clicked", self.adjust_a, "-")
+        for wcs in range(1, 3):
+            for axis in 'xyz':
+                self.buttons[f'wcs{wcs}{axis}+'].connect('clicked', self.adjust_wcs, wcs, axis.capitalize(), "+")
+                self.buttons[f'wcs{wcs}{axis}-'].connect('clicked', self.adjust_wcs, wcs, axis.capitalize(), "-")
 
         topbar = Gtk.Box(spacing=5, hexpand=True, vexpand=False)
 
@@ -59,6 +64,14 @@ class Panel(ScreenPanel):
         self.labels['a_offset'] = Gtk.Label()
         self.labels['adjust_grid'].attach(self.labels['a_offset'], 1, 0, 1, 1)
         self.labels['adjust_grid'].attach(self.buttons['a_plus'], 2, 0, 1, 1)
+        for wcs in range(1, 3):
+            self.labels[f'wcs{wcs}'] = Gtk.Label(f'WCS{wcs}')
+            self.labels['adjust_grid'].attach(self.labels[f'wcs{wcs}'], 0, wcs + 4 * (wcs - 1), 3, 1)
+            for axis_idx, axis in enumerate('xyz'):
+                self.labels[f'wcs{wcs}{axis}'] = Gtk.Label()
+                self.labels['adjust_grid'].attach(self.buttons[f"wcs{wcs}{axis}-"], 0, wcs + 1 + axis_idx + 4 * (wcs - 1), 1, 1)
+                self.labels['adjust_grid'].attach(self.labels[f'wcs{wcs}{axis}'], 1, wcs + 1 + axis_idx + 4 * (wcs - 1), 1, 1)
+                self.labels['adjust_grid'].attach(self.buttons[f"wcs{wcs}{axis}+"], 2, wcs + 1 + axis_idx + 4 * (wcs - 1), 1, 1)
 
         if self._screen.vertical_mode:
             grid.attach(self.labels['graph'], 0, 2, 2, 1)
@@ -150,10 +163,15 @@ class Panel(ScreenPanel):
     def process_update(self, action, data):
         if action != "notify_status_update":
             return
-        if "module_5d" in data and 'homing_origin' in data['module_5d']:
-            self.labels['a_offset'].set_text(
-                f"A: {data['module_5d']['homing_origin'][0]:.2f}"
-            )
+        if "module_5d" in data:
+            if 'homing_origin' in data['module_5d']:
+                self.labels['a_offset'].set_text(
+                    f"A: {data['module_5d']['homing_origin'][0]:.2f}"
+                )
+            if "wcs_offsets" in data["module_5d"]:
+                for wcs in range(1, 3):
+                    for axis_idx, axis in enumerate('xyz'):
+                        self.labels[f'wcs{wcs}{axis}'].set_text(f"{axis.capitalize()}: {data['module_5d']['wcs_offsets'][wcs][axis_idx]:.2f}")
         #TODO: ADD WCS UPDATE
 
     def remove_create(self):
@@ -200,15 +218,16 @@ class Panel(ScreenPanel):
             self._screen._ws.klippy.gcode_script("HOME_MODULE A=1 C=1")
         self._screen._send_action(widget, "printer.gcode.script", {"script": "TOOL_CALIBRATE"})
 
-    def adjust_a(self, widget):
-        pass
+    def adjust_a(self, widget, direction):
+        script = f"SET_GCODE_OFFSET A_ADJUST={direction}{self.distance}"
+        self._screen._send_action(widget, "printer.gcode.script", {"script": script})
+
+
+    def adjust_wcs(self, widget, wcs, axis, direction):
+        logging.info(f'adjust WCS: {wcs}, {axis}, {direction}')
+        dist = f"{direction}{self.distance}"
+        script = f"G10 L2 R1 P{wcs + 1} {axis}{dist}"
+        self._screen._send_action(widget, "printer.gcode.script", {"script": script})
 
     def send_clear_wcs(self, widget):
         self._screen._send_action(widget, "printer.gcode.script", {"script": "CLEAR_WCS"})
-
-    def send_save_mesh(self, widget, profile):
-        self._screen._send_action(widget, "printer.gcode.script", {"script": KlippyGcodes.bed_mesh_save(profile)})
-
-    def send_remove_mesh(self, widget, profile):
-        self._screen._send_action(widget, "printer.gcode.script", {"script": KlippyGcodes.bed_mesh_remove(profile)})
-        self.remove_profile(profile)
