@@ -23,9 +23,25 @@ class Panel(ScreenPanel):
         self.buttons = {
             'calib': self._gtk.Button("refresh", _("Calibrate"), "color3", self.bts, Gtk.PositionType.LEFT, 1),
             'clear': self._gtk.Button("cancel", _("Clear"), "color2", self.bts, Gtk.PositionType.LEFT, 1),
+            'a_plus': self._gtk.Button("", "-", "color2"),
+            'a_minus': self._gtk.Button("", "+", "color2"),
+            'wcs1x+': self._gtk.Button("", "+", "color2"),
+            'wcs1x-': self._gtk.Button("", "-", "color2"),
+            'wcs1y+': self._gtk.Button("", "+", "color2"),
+            'wcs1y-': self._gtk.Button("", "-", "color2"),
+            'wcs1z+': self._gtk.Button("", "+", "color2"),
+            'wcs1z-': self._gtk.Button("", "-", "color2"),
+            'wcs2x+': self._gtk.Button("", "+", "color2"),
+            'wcs2x-': self._gtk.Button("", "-", "color2"),
+            'wcs2y+': self._gtk.Button("", "+", "color2"),
+            'wcs2y-': self._gtk.Button("", "-", "color2"),
+            'wcs2z+': self._gtk.Button("", "+", "color2"),
+            'wcs2z-': self._gtk.Button("", "-", "color2"),
         }
         self.buttons['clear'].connect("clicked", self.send_clear_wcs)
         self.buttons['calib'].connect("clicked", self.tool_calibrate)
+        self.buttons['a_plus'].connect("clicked", self.adjust_a)
+        self.buttons['a_minus'].connect("clicked", self.adjust_a)
 
         topbar = Gtk.Box(spacing=5, hexpand=True, vexpand=False)
 
@@ -36,12 +52,21 @@ class Panel(ScreenPanel):
 
         grid = Gtk.Grid(column_homogeneous=True)
         grid.attach(topbar, 0, 0, 2, 1)
-        self.labels['map'] = self._gtk.Image("wcs-graph", self._gtk.content_width, self._gtk.content_height * .9)
-        if self._screen.vertical_mode:
-            grid.attach(self.labels['map'], 0, 2, 2, 1)
+        self.labels['graph'] = self._gtk.Image("wcs-graph", self._gtk.content_width * 0.8, self._gtk.content_height * .8)
 
+        self.labels['adjust_grid'] = Gtk.Grid(column_homogeneous=True)
+        self.labels['adjust_grid'].attach(self.buttons['a_minus'], 0, 0, 1, 1)
+        self.labels['a_offset'] = Gtk.Label()
+        self.labels['adjust_grid'].attach(self.labels['a_offset'], 1, 0, 1, 1)
+        self.labels['adjust_grid'].attach(self.buttons['a_plus'], 2, 0, 1, 1)
+
+        if self._screen.vertical_mode:
+            grid.attach(self.labels['graph'], 0, 2, 2, 1)
+            grid.attach(self.labels['adjust_grid'], 0, 3, 2, 1)
         else:
-            grid.attach(self.labels['map'], 0, 2, 1, 1)
+            grid.attach(self.labels['graph'], 0, 2, 1, 1)
+            grid.attach(self.labels['adjust_grid'], 1, 2, 1, 1)
+
         self.labels['main_grid'] = grid
         self.content.add(self.labels['main_grid'])
 
@@ -125,6 +150,10 @@ class Panel(ScreenPanel):
     def process_update(self, action, data):
         if action != "notify_status_update":
             return
+        if "module_5d" in data and 'homing_origin' in data['module_5d']:
+            self.labels['a_offset'].set_text(
+                f"A: {data['module_5d']['homing_origin'][0]:.2f}"
+            )
         #TODO: ADD WCS UPDATE
 
     def remove_create(self):
@@ -170,6 +199,9 @@ class Panel(ScreenPanel):
         if module_homed_axes != "ac":
             self._screen._ws.klippy.gcode_script("HOME_MODULE A=1 C=1")
         self._screen._send_action(widget, "printer.gcode.script", {"script": "TOOL_CALIBRATE"})
+
+    def adjust_a(self, widget):
+        pass
 
     def send_clear_wcs(self, widget):
         self._screen._send_action(widget, "printer.gcode.script", {"script": "CLEAR_WCS"})
