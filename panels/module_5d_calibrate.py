@@ -53,11 +53,12 @@ class Panel(ScreenPanel):
         topbar.add(self.buttons['clear'])
         topbar.add(self.buttons['calib'])
 
-        self.load_wcs()
+
 
         grid = Gtk.Grid(column_homogeneous=True)
         grid.attach(topbar, 0, 0, 2, 1)
-        self.labels['graph'] = self._gtk.Image("wcs-graph", self._gtk.content_width * 0.8, self._gtk.content_height * .8)
+        scale_f = 0.6 if self._screen.vertical_mode else 0.8
+        self.labels['graph'] = self._gtk.Image("wcs-graph", self._gtk.content_width * scale_f, self._gtk.content_height * scale_f)
 
         self.labels['adjust_grid'] = Gtk.Grid(column_homogeneous=True)
         self.labels['adjust_grid'].attach(self.buttons['a_minus'], 0, 0, 1, 1)
@@ -83,27 +84,10 @@ class Panel(ScreenPanel):
         self.labels['main_grid'] = grid
         self.content.add(self.labels['main_grid'])
 
-    def activate(self):
         self.load_wcs()
 
-
-    def retrieve_bm(self, profile):
-        if profile is None:
-            return None
-        if profile == self.active_mesh:
-            return self._printer.get_stat("bed_mesh")
-        else:
-            return self._printer.get_config_section(f"bed_mesh {profile}")
-
-    def update_graph(self, widget=None, profile=None):
-        if self.ks_printer_cfg is not None:
-            invert_x = self._config.get_config()['main'].getboolean("invert_x", False)
-            invert_y = self._config.get_config()['main'].getboolean("invert_y", False)
-            rotation = self.ks_printer_cfg.getint("screw_rotation", 0)
-            if rotation not in (0, 90, 180, 270):
-                rotation = 0
-
-            logging.info(f"Inversion X: {invert_x} Y: {invert_y} Rotation: {rotation}")
+    def activate(self):
+        self.load_wcs()
 
     def add_profile(self, profile):
         logging.debug(f"Adding Profile: {profile}")
@@ -113,8 +97,6 @@ class Panel(ScreenPanel):
         name.get_children()[0].set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
         name.set_vexpand(False)
         name.set_halign(Gtk.Align.START)
-
-        name.connect("clicked", self.update_graph, profile)
 
         buttons = {
             "save": self._gtk.Button("complete", None, "color4", self.bts),
@@ -158,7 +140,13 @@ class Panel(ScreenPanel):
         return False
 
     def load_wcs(self):
-        pass
+        wcs_offsets = self._printer.get_stat("module_5d", "wcs_offsets")
+        if not wcs_offsets:
+            return
+        for wcs in range(1, 3):
+            for axis_idx, axis in enumerate('xyz'):
+                self.labels[f'wcs{wcs}{axis}'].set_text(f"{axis.capitalize()}: {wcs_offsets[wcs][axis_idx]:.2f}")
+
 
     def process_update(self, action, data):
         if action != "notify_status_update":
@@ -172,7 +160,6 @@ class Panel(ScreenPanel):
                 for wcs in range(1, 3):
                     for axis_idx, axis in enumerate('xyz'):
                         self.labels[f'wcs{wcs}{axis}'].set_text(f"{axis.capitalize()}: {data['module_5d']['wcs_offsets'][wcs][axis_idx]:.2f}")
-        #TODO: ADD WCS UPDATE
 
     def remove_create(self):
         if self.show_create is False:
@@ -186,20 +173,6 @@ class Panel(ScreenPanel):
         self.content.add(self.labels['main_grid'])
         self.content.show()
 
-    def remove_profile(self, profile):
-        if profile not in self.profiles:
-            return
-
-        pos = self._get_position(profile)
-        self.labels['profiles'].remove_row(pos)
-        del self.profiles[profile]
-        if not self.profiles:
-            self._clear_profile()
-
-    def _clear_profile(self):
-        self.active_mesh = None
-        self.update_graph()
-        self.buttons['clear'].set_sensitive(False)
 
     def _get_position(self, profile):
         pl = list(self.profiles)
@@ -221,7 +194,6 @@ class Panel(ScreenPanel):
     def adjust_a(self, widget, direction):
         script = f"SET_GCODE_OFFSET A_ADJUST={direction}{self.distance}"
         self._screen._send_action(widget, "printer.gcode.script", {"script": script})
-
 
     def adjust_wcs(self, widget, wcs, axis, direction):
         logging.info(f'adjust WCS: {wcs}, {axis}, {direction}')
