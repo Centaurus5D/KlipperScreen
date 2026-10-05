@@ -1,244 +1,522 @@
-/* Material-darker theme created by Alfredo Monclus 2021 */
-@define-color color_1 #e2e2e2;
-@define-color color_2 #2196f3;
-@define-color color_3 #fb8c00;
-@define-color color_4 #9E9E9E;
-@define-color color_5 #121212;
-@define-color background-color_2 #1c1c1c;
-@define-color background-color_3 #424242;
-@define-color background-color_4 #252525;
-@define-color background-color_5 #0277bd;
-@define-color background-color_6 #006064;
-@define-color background-color_7 #545454;
-@define-color background-color_8 #006412;
-@define-color background-color_9 #ffc107;
-@define-color background-color_10 #ff5252;
-@define-color background-color_12 #f9b274;
-@define-color background-color_13 #CF6679;
-@define-color background-color_14 #090909;
-@define-color border-color_6 #a2a2a2;
-@define-color border-color_7 #282828;
+/* Stereotech Cloud, dark theme.
+   Tokens from the Stereotech Cloud design system (tokens.json, synced 2026-09-24).
+   Only this token block differs from steapp; the rules below are shared.
+   primary-ink is ink here: primary text on dark surface is 3.5:1, kept for 24px+ and fills.
+   on-negative is black here: white on the dark negative (#ff867f) is unreadable. */
+
+@define-color primary #0277bd;
+@define-color on-primary #ffffff;
+@define-color primary-ink #ffffff;
+@define-color selected alpha(@primary, 0.24);
+@define-color secondary #1d1d1d;
+@define-color accent #827eab;
+@define-color page #121212;
+@define-color surface #1d1d1d;
+@define-color ink #ffffff;
+@define-color ink-secondary rgba(255, 255, 255, 0.8);
+@define-color border rgba(255, 255, 255, 0.28);
+@define-color field-outline rgba(255, 255, 255, 0.6);
+@define-color positive #4caf50;
+@define-color negative #ff867f;
+@define-color on-negative #000000;
+@define-color warning #ffc107;
+@define-color info #d05ce3;
+@define-color notification #323232;
+@define-color press alpha(@ink, 0.1);
+
+/* base.css names mapped onto the design system */
+@define-color bg @page;
+@define-color text @ink;
+@define-color text-inv @page;
+@define-color active @selected;
+@define-color lines @border;
+@define-color echo @positive;
+@define-color error @negative;
+@define-color switch-scale-bg @primary;
+@define-color color1 @border;
+@define-color color2 @border;
+@define-color color3 @border;
+@define-color color4 @border;
+
+treeview.view check:checked {
+    -gtk-icon-source: url("./styles/steapp-dark/images/complete.svg");
+}
+
+/* === Rules === */
+/* Identical in steapp and steapp-dark: only @tokens above differ. */
 
 * {
-    color: #e2e2e2;
+    color: @ink;
     font-family: RobotoMedium;
+}
+
+label {
+    color: @ink;
+    padding-bottom: 0;
+    padding-top: 0;
 }
 
 junction,
 list row,
 treeview.view,
 window {
-    background-color: #121212;
+    background-color: @page;
 }
 
+/* Chrome: title bar = AppHeader, action bar = PageNavigation rail */
+
+.title_bar {
+    background-color: @secondary;
+    border-bottom: 1px solid @border;
+}
+
+.action_bar {
+    background-color: @secondary;
+}
+
+.action_bar.vertical {
+    border-right: 1px solid @border;
+}
+
+.action_bar.horizontal {
+    border-top: 1px solid @border;
+}
+
+/* Buttons: flat by default, Panel tiles for color1-4 */
+
 button {
-    background-color: #121212;
+    background-color: transparent;
+    border-radius: 3px;
+    padding: 0;
 }
 
 button:active {
-    background-color: #424242;
+    background-color: @press;
 }
 
-.button_active {
-    border-color: #424242;
-    border-style: solid;
-    background-color: #424242;
+button:disabled label {
+    color: @ink-secondary;
 }
 
 button.color1,
 button.color2,
 button.color3,
 button.color4 {
-    background-color: #252525;
-    border-color: #252525;
+    background-color: @surface;
+    border: 1px solid @border;
     border-radius: 4px;
-    padding-top: 0.1em;
 }
 
 button.color1:active,
 button.color2:active,
 button.color3:active,
-button.color4:active,
-button.update:active,
-button.invalid:active,
-.dialog button:active {
-    border-style: none;
-    background-color: #424242;
+button.color4:active {
+    background-color: @press;
 }
 
-.active image,
+.button_active,
+button.active {
+    background-color: @selected;
+    box-shadow: inset 0 0 0 2px @primary;
+}
+
+.active image {
+    background-color: @selected;
+}
+
+button.update,
+button.invalid {
+    background-color: transparent;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    font-weight: normal;
+}
+
 button.update {
-    color: #2196f3;
-    background-color: #121212;
-    border-color: #2196f3;
-    border-radius: .5em;
-    border-width: .1em;
+    border-color: @primary;
+}
+
+button.update label {
+    color: @primary-ink;
 }
 
 button.invalid {
-    color: #fb8c00;
-    background-color: #121212;
-    border-color: #fb8c00;
-    border-radius: .5em;
-    border-width: .1em;
+    border-color: @negative;
 }
+
+button.invalid label {
+    color: @negative;
+}
+
+button.update:active,
+button.invalid:active {
+    background-color: @press;
+}
+
+/* Segmented toggles (q-btn-toggle) */
+
+.horizontal_togglebuttons {
+    background-color: @surface;
+    border-color: @field-outline;
+    border-width: 1px;
+    border-right-width: 0;
+    min-height: 2em;
+}
+
+.horizontal_togglebuttons:last-child {
+    border-right-width: 1px;
+}
+
+.horizontal_togglebuttons:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.horizontal_togglebuttons:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.horizontal_togglebuttons_active {
+    background-color: @primary;
+}
+
+.horizontal_togglebuttons_active label {
+    color: @on-primary;
+}
+
+/* Fields (q-input outlined) */
+
+entry {
+    background-color: @surface;
+    border: 1px solid @field-outline;
+    border-radius: 4px;
+}
+
+entry:focus {
+    border-color: @primary;
+    box-shadow: inset 0 0 0 1px @primary;
+}
+
+/* Menus, combo boxes, popovers (q-menu) */
 
 menu,
 menuitem,
 combobox button,
 combobox arrow,
 combobox menuitem {
-    background-color: #252525;
-    border-color: #121212;
+    background-color: @surface;
+    border-color: @border;
 }
+
+combobox button {
+    border: 1px solid @field-outline;
+    border-radius: 4px;
+}
+
+popover {
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 4px;
+}
+
+popover button {
+    background-color: @surface;
+}
+
+popover button:active {
+    background-color: @press;
+}
+
+/* Toggles and checkboxes */
 
 treeview.view check,
 switch {
-    background-color: #1c1c1c;
+    background-color: @field-outline;
+    background-image: none;
 }
 
 treeview.view check:checked,
 switch:checked {
-    background-color: #0277bd;
+    background-color: @primary;
 }
 
-treeview.view check:checked {
-    -gtk-icon-source: url("./styles/material-darker/images/complete.svg");
+switch slider {
+    background-color: @surface;
+    background-image: none;
+    border: 1px solid @border;
+    border-radius: 3em;
 }
 
-label {
-    color: #e2e2e2;
-}
+/* Sliders and progress */
 
 trough {
-    background-color: #121212;
-    color: #e2e2e2;
+    background-color: @border;
+    border: 0;
+    color: @ink;
 }
 
 trough highlight,
 trough progress {
-    background-color: #0277bd;
-    color: #e2e2e2;
+    background-color: @primary;
+    border: 0;
+    color: @ink;
 }
 
-scale-mark {
-    color: #e2e2e2;
+.option_slider_max trough highlight {
+    background-color: @negative;
+}
+
+scale slider {
+    background-color: @surface;
+    background-image: none;
+    border: 2px solid @primary;
+    border-radius: 100%;
+}
+
+scale-mark,
+scale mark {
+    color: @ink;
+}
+
+.fan_slider {
+    color: @ink;
 }
 
 scrollbar,
 scrollbar button,
 scrollbar trough {
-    background-color: #121212;
+    background-color: @page;
 }
 
 scrollbar slider {
-    background-color: #1c1c1c;
+    background-color: @field-outline;
 }
 
-textview .time {
-    color: #9E9E9E;
+spinner {
+    color: @primary;
+}
+
+/* Lists and dividers */
+
+separator {
+    background-color: @border;
+}
+
+.frame-item {
+    border-bottom: 1px solid @border;
 }
 
 .active_device {
-    background-color: #1c1c1c;
+    background-color: @selected;
 }
 
+textview .time {
+    color: @ink-secondary;
+}
+
+/* Print status */
+
+.printing-status,
+.printing-progress-text {
+    color: @ink;
+}
+
+.printing-status-label {
+    color: @ink-secondary;
+}
+
+.printing-info button {
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 4px;
+}
+
+/* Dialogs: one unelevated primary action, flat for the rest */
+
 .dialog {
-    border: 0;
-    background-color: #121212;
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 4px;
 }
 
 .dialog button {
-    background-color: #252525;
-    border-radius: .25em;
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 3px;
 }
 
-
-.dialog-error {
-    border-bottom-color: #CF6679;
+button.dialog-default,
+button.dialog-secondary,
+button.dialog-info {
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 3px;
 }
 
-.dialog-warning {
-    border-bottom-color: #f9b274;
+button.dialog-default label,
+button.dialog-secondary label,
+button.dialog-info label {
+    color: @primary-ink;
 }
 
-.dialog-info {
-    border-bottom-color: @color4;
+button.dialog-primary {
+    background-color: @primary;
+    border: 1px solid @primary;
+    border-radius: 3px;
 }
 
-.dialog-default {
-    border-bottom-color: @color3;
+button.dialog-primary label {
+    color: @on-primary;
 }
 
-.dialog-secondary {
-    border-bottom-color: @color2;
+button.dialog-error {
+    background-color: @surface;
+    border: 1px solid @negative;
+    border-radius: 3px;
 }
 
-.dialog-primary {
-    border-bottom-color: @color1;
+button.dialog-error label {
+    color: @negative;
 }
 
-.horizontal_togglebuttons {
-    border-color: #545454;
-    border-width: 2px;
-    background-color: #252525;
+button.dialog-warning {
+    background-color: @warning;
+    border: 1px solid @warning;
+    border-radius: 3px;
 }
 
-.horizontal_togglebuttons_active {
-    background-color: #545454;
+button.dialog-warning label {
+    color: #000000;
 }
 
-.fan_slider {
-    color: #e2e2e2;
+.dialog button:active,
+button.dialog-default:active,
+button.dialog-secondary:active,
+button.dialog-info:active,
+button.dialog-error:active {
+    background-color: @press;
 }
+
+button.dialog-primary:active {
+    background-color: shade(@primary, 0.85);
+}
+
+button.dialog-warning:active {
+    background-color: shade(@warning, 0.9);
+}
+
+/* Toasts (q-notify) */
 
 .message_popup {
-    border-bottom-color: #e2e2e2;
+    border: 0;
+    border-radius: 4px;
 }
 
 .message_popup_echo,
 .message_popup_echo button {
-    background-color: #006412;
+    background-color: @notification;
 }
 
 .message_popup_warning,
 .message_popup_warning button {
-    background-color: #ffc107;
+    background-color: @warning;
 }
 
 .message_popup_error,
 .message_popup_error button {
-    background-color: #ff5252;
+    background-color: @negative;
 }
 
-.numpad_key {
-    border-color: #545454;
-    background-color: #252525;
+.message_popup_echo label {
+    color: #ffffff;
 }
 
-.printing-status {
-    color: #e2e2e2;
+.message_popup_error label {
+    color: @on-negative;
 }
 
-.printing-progress-text {
-    color: #e2e2e2;
+.message_popup_warning label {
+    color: #000000;
 }
 
-.printing-status-label {
-    color: #9E9E9E;
-}
+/* Klipper error screen */
 
 .message {
-    border-color: #ff5252;
-    color: #e2e2e2;
-    background-color: #ff5252;
+    background-color: @negative;
+    border-color: @negative;
+}
+
+.message label {
+    color: @on-negative;
 }
 
 .message button {
-    background-color: #e2e2e2;
-    color: #121212;
+    background-color: @surface;
+    border-radius: 3px;
+}
+
+.message button label {
+    color: @ink;
+}
+
+/* Numpad and on-screen keyboard */
+
+.numpad_key {
+    background-color: @surface;
+    border-color: @border;
+    border-width: 1px 0 0 1px;
+}
+
+.numpad_tright,
+.numpad_right,
+.numpad_bright {
+    border-right-width: 1px;
+}
+
+.numpad_bleft,
+.numpad_bottom,
+.numpad_bright {
+    border-bottom-width: 1px;
+}
+
+.numpad_tleft {
+    border-top-left-radius: 4px;
+}
+
+.numpad_tright {
+    border-top-right-radius: 4px;
+}
+
+.numpad_bleft {
+    border-bottom-left-radius: 4px;
+}
+
+.numpad_bright {
+    border-bottom-right-radius: 4px;
+}
+
+.numpad_key:active {
+    background-color: @press;
 }
 
 .keyboard_pad {
-    background-color: #090909;
+    background-color: @surface;
+    border: 1px solid @border;
+    border-radius: 4px;
+}
+
+.keyboard_pad:active {
+    background-color: @press;
+}
+
+/* Filament sensor */
+
+.filament_sensor_detected {
+    background-color: @positive;
+}
+
+.filament_sensor_empty {
+    background-color: @negative;
 }
